@@ -16,6 +16,8 @@ public class SortTechniques {
             }
             System.out.println();
         }
+
+        SelectionSort(myArray[2], sizeOfArrays);
     }
 
     public static int[][] FillMyArray(int numOfArrays, int sizeOfArrays, Random random) {
@@ -65,5 +67,49 @@ public class SortTechniques {
             numRand = (i < threshold) ? numRand + random.nextInt(10) : random.nextInt(10);
         }
         return tempArray;
+    }
+
+    public static void BubleSort(int[] array, int arraySize)
+    {       
+        for(int i = arraySize; i >= 0; i--)
+        {
+            for(int j = 1; j < i; j++)
+            {
+                if(array[j] < array[j-1])
+                {
+                    int temp = array[j-1];
+                    array[j-1] = array[j];
+                    array[j] = temp;
+                }
+            }
+        }
+
+        for(int i = 0; i < arraySize; i++)
+        {
+            System.out.print(array[i] + "\t");
+        }
+    }
+
+    public static void SelectionSort(int[] array, int arraySize)
+    {       
+        for(int i = arraySize; i > 0; i--)
+        {
+            int indexOfMaxValue = 0;
+            for(int j = 1; j < i; j++)
+            {
+                if(array[indexOfMaxValue] <= array[j])
+                {
+                    indexOfMaxValue = j;
+                }
+            }
+            int temp = array[i-1];
+            array[i-1] = array[indexOfMaxValue];
+            array[indexOfMaxValue] = temp;
+        }
+
+        for(int i = 0; i < arraySize; i++)
+        {
+            System.out.print(array[i] + "\t");
+        }
     }
 }
