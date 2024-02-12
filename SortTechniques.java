@@ -8,16 +8,45 @@ public class SortTechniques {
         int sizeOfArrays = 10;
         int[][] myArray = FillMyArray(numOfArrays, sizeOfArrays, random);
 
+        System.out.println("Initial Arrays");
         for(int i = 0; i < numOfArrays; i++)
         {
+            System.out.print((i+1) + " : ");
             for (int j = 0; j< sizeOfArrays; j++)
             {
                 System.out.print(myArray[i][j] + "\t");
             }
             System.out.println();
         }
+        System.out.println();
 
-        SelectionSort(myArray[2], sizeOfArrays);
+
+        System.out.println("Buble Sort:");
+        for(int i = 0; i < numOfArrays; i++)
+        {
+            System.out.print((i+1) + " : ");
+            BubleSort(myArray[i], sizeOfArrays);
+            System.out.println();
+        }
+        System.out.println();
+
+        System.out.println("Selection Sort:");
+        for(int i = 0; i < numOfArrays; i++)
+        {
+            System.out.print((i+1) + " : ");
+            SelectionSort(myArray[i], sizeOfArrays);
+            System.out.println();
+        }
+        System.out.println();
+
+        System.out.println("Insertion Sort:");
+        for(int i = 0; i < numOfArrays; i++)
+        {
+            System.out.print((i+1) + " : ");
+            InsertionSort(myArray[i], sizeOfArrays);
+            System.out.println();
+        }
+
     }
 
     public static int[][] FillMyArray(int numOfArrays, int sizeOfArrays, Random random) {
@@ -70,7 +99,8 @@ public class SortTechniques {
     }
 
     public static void BubleSort(int[] array, int arraySize)
-    {       
+    {
+        long startTime = System.nanoTime();
         for(int i = arraySize; i >= 0; i--)
         {
             for(int j = 1; j < i; j++)
@@ -83,15 +113,19 @@ public class SortTechniques {
                 }
             }
         }
+        long endTime = System.nanoTime();
+        long elapsedTime = endTime - startTime;
 
         for(int i = 0; i < arraySize; i++)
         {
             System.out.print(array[i] + "\t");
         }
+        System.out.print(" Time: " + elapsedTime);
     }
 
     public static void SelectionSort(int[] array, int arraySize)
-    {       
+    {
+        long startTime = System.nanoTime();       
         for(int i = arraySize; i > 0; i--)
         {
             int indexOfMaxValue = 0;
@@ -106,10 +140,39 @@ public class SortTechniques {
             array[i-1] = array[indexOfMaxValue];
             array[indexOfMaxValue] = temp;
         }
+        long endTime = System.nanoTime();
+        long elapsedTime = endTime - startTime;
 
         for(int i = 0; i < arraySize; i++)
         {
             System.out.print(array[i] + "\t");
         }
+        System.out.print(" Time: " + elapsedTime);
+    }
+
+    public static void InsertionSort(int[] array, int arraySize)
+    {
+        long startTime = System.nanoTime();       
+        for(int i = 0; i < arraySize - 1; i++)
+        {
+            if(array[i]>array[i+1])
+            {
+                for(int j = i + 1; (array[j-1] > array[j]) && (j > 0); j--)
+                {
+                    int temp = array[j];
+                    array[j] = array[j-1];
+                    array[j-1] = temp;
+                }
+            }
+        }
+        long endTime = System.nanoTime();
+        long elapsedTime = (endTime - startTime);
+
+        for(int i = 0; i < arraySize; i++)
+        {
+            System.out.print(array[i] + "\t");
+        }
+        System.out.print(" Time: " + (long)(elapsedTime));
+
     }
 }
