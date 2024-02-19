@@ -9,14 +9,14 @@ public class FactorialAndFibonacci
         System.out.println("Hello, User! input a number for evaluating Factorial and Fibonacci");
         try 
         {
-             value = ReadIntValue(1, 16);
+            value = ReadIntValue(1, 16);
+            System.out.println("Factorial of " + value + " is " + recursiveFactorial(value));
+            System.out.println("Fibonacci under position " + value + " is " + recursiveFibonacci(value));
         } 
         catch (ValueOutOfRangeException e) 
         {
             System.out.println(e.getMessage());
         }
-        System.out.println("Factorial of " + value + " is " + recursiveFactorial(value));
-        System.out.println("Fibonacci under position " + value + " is " + recursiveFibonacci(value));
     }
 
     public static int recursiveFactorial(int value) {
