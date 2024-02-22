@@ -22,7 +22,7 @@ public class Queue {
         return size == capacity;
     }
 
-    public void enqueue(Object item) {
+    public Object enqueue(Object item) {
         if (!isFull()) {
             rear = (rear + 1) % capacity;
             items[rear] = item;
@@ -30,6 +30,7 @@ public class Queue {
         } else {
             throw new IllegalStateException("enqueue to a full queue");
         }
+        return item;
     }
 
     public Object dequeue() {

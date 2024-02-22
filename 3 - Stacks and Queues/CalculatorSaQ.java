@@ -2,39 +2,86 @@ import java.util.Scanner;
 
 public class CalculatorSaQ {
     public static void main(String[] args) {
-        Stack stack = new Stack(1);
-        try {
-            Object value = EvaluatePostfix();
-        System.out.println("Value " + value);
-        }   
-        catch (IllegalArgumentException e) 
+        Queue q = EvaluatePostfix();
+
+        int size  = q.size();
+        for(int i = 0; i < size; i++)
         {
-            System.out.println("Invalid expression: " + e.getMessage());
-        }   
-        catch (IllegalStateException e) 
-        {
-            System.out.println("Caught IllegalStateException: " + e.getMessage());
+            System.out.print(q.dequeue());
         }
     }
 
-    private static Object EvaluatePostfix()
+    private static Queue EvaluatePostfix()
     {
         String infix = ReadInfix();
 
         Stack operators = new Stack(1);
-        Queue postfix = new Queue(infix.length());
+        Queue postfix = new Queue(infix.length()*2);
 
-        for(int i = 0; i < usrInput.length(); i++)
+        for(int i = 0; i < infix.length(); i++)
         {
-            char currentChar = usrInput.charAt(i);
+            char currentChar = infix.charAt(i);
 
-            if("0-9".indexOf(currentChar) != -1)
+            //System.out.println(currentChar);
+
+            
+
+            if("0123456789".indexOf(currentChar) != -1)
             {
-
+                postfix.enqueue(currentChar);
+            }
+            else if("^*/+-".indexOf(currentChar) != -1)
+            {
+                postfix.enqueue(" ");
+                if(operators.isEmpty() || hasPowerOver(currentChar, operators.peek()))
+                {
+                    operators.push(currentChar);
+                }
+                else if(!hasPowerOver(currentChar, operators.peek()) && !hasPowerOver(operators.peek(), currentChar))
+                {
+                    postfix.enqueue(operators.pop());
+                    operators.push(currentChar);
+                    postfix.enqueue(" ");
+                }
+                else
+                {
+                    while(!operators.isEmpty() && hasPowerOver(operators.peek(), currentChar))
+                    {
+                        postfix.enqueue(operators.pop());
+                        postfix.enqueue(" ");
+                    }
+                    operators.push(currentChar);
+                }
+            }
+            else if("(".indexOf(currentChar) != -1)
+            {
+                operators.push(currentChar);
+            }
+            else if(")".indexOf(currentChar) != -1)
+            {
+                while((char)operators.peek() != '(')
+                {
+                    postfix.enqueue(" ");
+                    postfix.enqueue(operators.pop());
+                }
+                operators.pop();
             }
         }
 
-        return infix;
+        while(!operators.isEmpty())
+        {
+            postfix.enqueue(" ");
+            postfix.enqueue(operators.pop());
+        }
+
+        return postfix;
+    }
+
+    private static boolean hasPowerOver(Object queueOperator, Object infixOperator)
+    {
+        if (((char) queueOperator == '^') || (((char) queueOperator == '*' || (char) queueOperator == '/') && ((char)infixOperator == '+' || (char)infixOperator == '-')) || ((char)infixOperator == '(' && ((char)queueOperator == '-' || (char)queueOperator == '+' || (char)queueOperator == '*' || (char)queueOperator == '/')))
+            return true;
+        return false;
     }
 
     private static String ReadInfix() 
@@ -44,7 +91,7 @@ public class CalculatorSaQ {
         String usrInput = scanner.nextLine().replaceAll("\\s", "");
         int bracketCounter = 0;
 
-        if (!usrInput.matches("[()+\\-*/0-9]+") || usrInput.startsWith(")")) {
+        if (!usrInput.matches("[()+\\-^*/0-9]+") || usrInput.startsWith(")")) {
             throw new IllegalArgumentException("Invalid characters in the input.");
         }
 
@@ -52,7 +99,7 @@ public class CalculatorSaQ {
             char currentChar = usrInput.charAt(i);
             char nextChar = (i < usrInput.length() - 1) ? usrInput.charAt(i + 1) : '\0';
 
-            if (("+-*/".indexOf(currentChar) != -1 && "+-*/)".indexOf(nextChar) != -1) || (nextChar == '+' || nextChar == '*' || nextChar == '/') && currentChar == '(') 
+            if (("+-*^/".indexOf(currentChar) != -1 && "+^-*/)".indexOf(nextChar) != -1) || (nextChar == '+' || nextChar == '*' || nextChar == '/') && currentChar == '(') 
             {
                 throw new IllegalArgumentException("Two consecutive operators found: " + currentChar + nextChar);
             }
@@ -70,4 +117,6 @@ public class CalculatorSaQ {
 
         return usrInput;
     }
+
+
 }
