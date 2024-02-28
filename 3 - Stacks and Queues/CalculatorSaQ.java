@@ -2,105 +2,95 @@ import java.util.Scanner;
 
 public class CalculatorSaQ {
     public static void main(String[] args) {
-        Queue q = EvaluatePostfix();
+        
+        Queue postfixQueue = evaluatePostfix();
 
-        int size  = q.size();
-        for(int i = 0; i < size; i++)
-        {
-            System.out.print(q.dequeue());
+        int queueSize = postfixQueue.size();
+        System.out.print("Postfix expression: ");
+        for (int i = 0; i < queueSize; i++) {
+            System.out.print(postfixQueue.dequeue());
         }
     }
 
-    private static Queue EvaluatePostfix()
-    {
-        String infix = ReadInfix();
+    private static Queue evaluatePostfix() {
+        String infixExpression = readInfix();
 
-        Stack operators = new Stack(1);
-        Queue postfix = new Queue(infix.length()*2);
+        Stack operatorsStack = new Stack(1);
+        Queue postfixQueue = new Queue(infixExpression.length() * 2);
 
-        for(int i = 0; i < infix.length(); i++)
-        {
-            char currentChar = infix.charAt(i);
+        for (int i = 0; i < infixExpression.length(); i++) {
+            char currentChar = infixExpression.charAt(i);
 
-            //System.out.println(currentChar);
-
-            
-
-            if("0123456789".indexOf(currentChar) != -1)
-            {
-                postfix.enqueue(currentChar);
-            }
-            else if("^*/+-".indexOf(currentChar) != -1)
-            {
-                postfix.enqueue(" ");
-                if(operators.isEmpty() || hasPowerOver(currentChar, operators.peek()))
-                {
-                    operators.push(currentChar);
-                }
-                else if(!hasPowerOver(currentChar, operators.peek()) && !hasPowerOver(operators.peek(), currentChar))
-                {
-                    postfix.enqueue(operators.pop());
-                    operators.push(currentChar);
-                    postfix.enqueue(" ");
-                }
-                else
-                {
-                    while(!operators.isEmpty() && hasPowerOver(operators.peek(), currentChar))
-                    {
-                        postfix.enqueue(operators.pop());
-                        postfix.enqueue(" ");
-                    }
-                    operators.push(currentChar);
-                }
-            }
-            else if("(".indexOf(currentChar) != -1)
-            {
-                operators.push(currentChar);
-            }
-            else if(")".indexOf(currentChar) != -1)
-            {
-                while((char)operators.peek() != '(')
-                {
-                    postfix.enqueue(" ");
-                    postfix.enqueue(operators.pop());
-                }
-                operators.pop();
+            if ("0123456789".indexOf(currentChar) != -1) {
+                postfixQueue.enqueue(currentChar);
+            } else if ("^*/+-".indexOf(currentChar) != -1) {
+                processOperator(currentChar, operatorsStack, postfixQueue);
+            } else if ("(".indexOf(currentChar) != -1) {
+                operatorsStack.push(currentChar);
+            } else if (")".indexOf(currentChar) != -1) {
+                processClosingParenthesis(operatorsStack, postfixQueue);
             }
         }
 
-        while(!operators.isEmpty())
-        {
-            postfix.enqueue(" ");
-            postfix.enqueue(operators.pop());
+        while (!operatorsStack.isEmpty()) {
+            postfixQueue.enqueue(" ");
+            postfixQueue.enqueue(operatorsStack.pop());
         }
 
-        return postfix;
+        return postfixQueue;
     }
 
-    private static boolean hasPowerOver(Object queueOperator, Object infixOperator)
-    {
-        if (((char) queueOperator == '^') || (((char) queueOperator == '*' || (char) queueOperator == '/') && ((char)infixOperator == '+' || (char)infixOperator == '-')) || ((char)infixOperator == '(' && ((char)queueOperator == '-' || (char)queueOperator == '+' || (char)queueOperator == '*' || (char)queueOperator == '/')))
-            return true;
-        return false;
+    private static void processOperator(char currentChar, Stack operatorsStack, Queue postfixQueue) {
+        postfixQueue.enqueue(" ");
+        if (operatorsStack.isEmpty() || hasPowerOver(currentChar, operatorsStack.peek())) {
+            operatorsStack.push(currentChar);
+        } else if (!hasPowerOver(currentChar, operatorsStack.peek()) && !hasPowerOver(operatorsStack.peek(), currentChar)) {
+            postfixQueue.enqueue(operatorsStack.pop());
+            operatorsStack.push(currentChar);
+            postfixQueue.enqueue(" ");
+        } else {
+            while (!operatorsStack.isEmpty() && hasPowerOver(operatorsStack.peek(), currentChar)) {
+                postfixQueue.enqueue(operatorsStack.pop());
+                postfixQueue.enqueue(" ");
+            }
+            operatorsStack.push(currentChar);
+        }
     }
 
-    private static String ReadInfix() 
-    {
+    private static boolean hasPowerOver(Object queueOperator, Object infixOperator) {
+        return ((char) queueOperator == '^') || (((char) queueOperator == '*' || (char) queueOperator == '/') && ((char) infixOperator == '+' || (char) infixOperator == '-'))
+                || ((char) infixOperator == '(' && ((char) queueOperator == '-' || (char) queueOperator == '+' || (char) queueOperator == '*' || (char) queueOperator == '/'));
+    }
+
+    private static void processClosingParenthesis(Stack operatorsStack, Queue postfixQueue) {
+        while ((char) operatorsStack.peek() != '(') {
+            postfixQueue.enqueue(" ");
+            postfixQueue.enqueue(operatorsStack.pop());
+        }
+        operatorsStack.pop();
+    }
+
+    private static String readInfix() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter a string: ");
-        String usrInput = scanner.nextLine().replaceAll("\\s", "");
+        String userInput = scanner.nextLine().replaceAll("\\s", "");
+        validateInput(userInput);
+        return userInput;
+    }
+
+    private static void validateInput(String userInput) {
         int bracketCounter = 0;
 
-        if (!usrInput.matches("[()+\\-^*/0-9]+") || usrInput.startsWith(")")) {
+        if (!userInput.matches("[()+\\-^*/0-9]+") || userInput.startsWith(")")) {
             throw new IllegalArgumentException("Invalid characters in the input.");
         }
 
-        for (int i = 0; i < usrInput.length(); i++) {
-            char currentChar = usrInput.charAt(i);
-            char nextChar = (i < usrInput.length() - 1) ? usrInput.charAt(i + 1) : '\0';
+        for (int i = 0; i < userInput.length(); i++) {
+            char currentChar = userInput.charAt(i);
+            char nextChar = (i < userInput.length() - 1) ? userInput.charAt(i + 1) : '\0';
 
-            if (("+-*^/".indexOf(currentChar) != -1 && "+^-*/)".indexOf(nextChar) != -1) || (nextChar == '+' || nextChar == '*' || nextChar == '/') && currentChar == '(') 
-            {
+            if (("+-*^/".indexOf(currentChar) != -1 && "+^-*/)".indexOf(nextChar) != -1) ||
+                    (nextChar == '+' || nextChar == '*' || nextChar == '/') && currentChar == '(') {
                 throw new IllegalArgumentException("Two consecutive operators found: " + currentChar + nextChar);
             }
 
@@ -114,9 +104,5 @@ public class CalculatorSaQ {
         if (bracketCounter != 0) {
             throw new IllegalArgumentException("Expected additional operator \"(\" or \")\".");
         }
-
-        return usrInput;
     }
-
-
 }
